@@ -9,7 +9,6 @@ st.write("Muhammad Nouval Ghoizy")
 st.write("Bangkit ID : m179b4ky2973 ")
 st.write("Bangkit Mail : m179b4ky2973@bangkit.academy ")
 
-
 # Load data
 day_df = pd.read_csv("day.csv")
 hour_df = pd.read_csv("hour.csv")
@@ -28,26 +27,11 @@ hour_missing_values = hour_df.isna().sum()
 day_duplicates = day_df.duplicated().sum()
 hour_duplicates = hour_df.duplicated().sum()
 
-# Checking for missing values
-st.write("### Missing Values")
-day_missing_values = day_df.isna().sum()
-hour_missing_values = hour_df.isna().sum()
-st.write("Day DataFrame Missing Values:", day_missing_values)
-st.write("Hour DataFrame Missing Values:", hour_missing_values)
-
-# Checking for duplicates
-st.write("### Duplicates")
-day_duplicates = day_df.duplicated().sum()
-hour_duplicates = hour_df.duplicated().sum()
-st.write("Day DataFrame Duplicates:", day_duplicates)
-st.write("Hour DataFrame Duplicates:", hour_duplicates)
-
-## 2. Cleaning Data
-# As per the provided code, no cleaning is necessary, so we can skip this part or add an optional cleaning step if needed
+# Cleaning data
+# No cleaning needed as per the provided code.
 
 # Exploratory Data Analysis (EDA)
-st.subheader("Exploratory Data Analysis (EDA)")
-
+# Visualizations
 # Pertanyaan 1: Bagaimana suhu rata-rata memengaruhi jumlah penyewaan sepeda?
 st.write("### Pertanyaan 1: Bagaimana suhu rata-rata memengaruhi jumlah penyewaan sepeda?")
 temperature_hourly = bike_df.groupby("temp")["cnt_hour"].mean().reset_index()
@@ -58,6 +42,7 @@ plt.title("Pengaruh Suhu terhadap Jumlah Penyewaan Sepeda per Jam")
 plt.xlabel("Suhu (dalam skala 0-1, dengan 1 sebagai suhu maksimal)")
 plt.ylabel("Rata-rata Jumlah Penyewaan Sepeda per Jam")
 st.pyplot(plt)
+
 
 # Pertanyaan 2: Apakah musim tertentu lebih populer untuk penyewaan sepeda?
 st.write("### Pertanyaan 2: Apakah musim tertentu lebih populer untuk penyewaan sepeda?")
@@ -71,13 +56,16 @@ plt.ylabel("Rata-rata Jumlah Penyewaan Sepeda per Jam")
 plt.xticks(ticks=[0, 1, 2, 3], labels=['Spring', 'Summer', 'Fall', 'Winter'])
 st.pyplot(plt)
 
+
 # Displaying Dataframe and other information if needed
-st.subheader("Data Information")
-st.write("### Day DataFrame (5 Rows):")
-st.write(day_df.head())
+st.subheader("Data Info")
+st.write("Day DataFrame Info:", day_info)
+st.write("Hour DataFrame Info:", hour_info)
 
-st.write("### Hour DataFrame (5 Rows):")
-st.write(hour_df.head())
+st.subheader("Missing Values")
+st.write("Day DataFrame Missing Values:", day_missing_values)
+st.write("Hour DataFrame Missing Values:", hour_missing_values)
 
-st.write("### Merged DataFrame (5 Rows):")
-st.write(bike_df.head())
+st.subheader("Duplicates")
+st.write("Day DataFrame Duplicates:", day_duplicates)
+st.write("Hour DataFrame Duplicates:", hour_duplicates)
