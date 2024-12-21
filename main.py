@@ -16,6 +16,9 @@ hour_df = pd.read_csv("hour.csv")
 # Merge dataframes
 bike_df = hour_df.merge(day_df, on='dteday', how='inner', suffixes=('_hour', '_day'))
 
+# Check the columns in bike_df
+st.write("Columns in bike_df:", bike_df.columns)
+
 # Data wrangling and exploration
 # Assessing data
 day_info = day_df.info()
@@ -32,30 +35,35 @@ hour_duplicates = hour_df.duplicated().sum()
 
 # Exploratory Data Analysis (EDA)
 # Visualizations
-# Pertanyaan 1: Bagaimana suhu rata-rata memengaruhi jumlah penyewaan sepeda?
-st.write("### Pertanyaan 1: Bagaimana suhu rata-rata memengaruhi jumlah penyewaan sepeda?")
-temperature_hourly = bike_df.groupby("temp")["cnt_hour"].mean().reset_index()
 
-plt.figure(figsize=(10, 6))
-sns.lineplot(x="temp", y="cnt_hour", data=temperature_hourly)
-plt.title("Pengaruh Suhu terhadap Jumlah Penyewaan Sepeda per Jam")
-plt.xlabel("Suhu (dalam skala 0-1, dengan 1 sebagai suhu maksimal)")
-plt.ylabel("Rata-rata Jumlah Penyewaan Sepeda per Jam")
-st.pyplot(plt)
+# Pertanyaan 1: Pengaruh suhu rata-rata terhadap jumlah penyewaan sepeda
+# Check the column name for temperature
+if 'temp' in bike_df.columns:
+    temperature_rentals = bike_df.groupby("temp")["cnt_hour"].mean().reset_index()
 
+    plt.figure(figsize=(10, 6))
+    sns.lineplot(x="temp", y="cnt_hour", data=temperature_rentals)
+    plt.title("Pengaruh Suhu Rata-rata terhadap Jumlah Penyewaan Sepeda per Jam")
+    plt.xlabel("Suhu Rata-rata")
+    plt.ylabel("Rata-rata Jumlah Penyewaan Sepeda per Jam")
+    st.pyplot(plt)
+else:
+    st.write("The 'temp' column is not present in the data. Please check the correct column name for temperature.")
 
 # Pertanyaan 2: Apakah musim tertentu lebih populer untuk penyewaan sepeda?
-st.write("### Pertanyaan 2: Apakah musim tertentu lebih populer untuk penyewaan sepeda?")
-season_hourly = bike_df.groupby("season")["cnt_hour"].mean().reset_index()
+# Assuming 'season' is present in the dataset (1 = spring, 2 = summer, 3 = fall, 4 = winter)
+if 'season' in bike_df.columns:
+    season_rentals = bike_df.groupby("season")["cnt_hour"].mean().reset_index()
 
-plt.figure(figsize=(10, 6))
-sns.barplot(x="season", y="cnt_hour", data=season_hourly)
-plt.title("Pengaruh Musim terhadap Jumlah Penyewaan Sepeda per Jam")
-plt.xlabel("Musim")
-plt.ylabel("Rata-rata Jumlah Penyewaan Sepeda per Jam")
-plt.xticks(ticks=[0, 1, 2, 3], labels=['Spring', 'Summer', 'Fall', 'Winter'])
-st.pyplot(plt)
-
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x="season", y="cnt_hour", data=season_rentals)
+    plt.title("Perbandingan Jumlah Penyewaan Sepeda pada Musim yang Berbeda")
+    plt.xlabel("Musim")
+    plt.ylabel("Rata-rata Jumlah Penyewaan Sepeda per Jam")
+    plt.xticks(ticks=[0, 1, 2, 3], labels=['Spring', 'Summer', 'Fall', 'Winter'])
+    st.pyplot(plt)
+else:
+    st.write("The 'season' column is not present in the data. Please check the correct column name for season.")
 
 # Displaying Dataframe and other information if needed
 st.subheader("Data Info")
