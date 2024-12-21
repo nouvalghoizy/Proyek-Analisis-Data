@@ -16,8 +16,14 @@ hour_df = pd.read_csv("hour.csv")
 # Merge dataframes
 bike_df = hour_df.merge(day_df, on='dteday', how='inner', suffixes=('_hour', '_day'))
 
-# Check the columns in bike_df
-st.write("Columns in bike_df:", bike_df.columns)
+# Make sure 'dteday' is in datetime format
+bike_df['dteday'] = pd.to_datetime(bike_df['dteday'])
+
+# Create 'weekday' column (0=Monday, 6=Sunday)
+bike_df['weekday'] = bike_df['dteday'].dt.weekday
+
+# Check the first few rows to ensure 'weekday' was created correctly
+st.write(bike_df.head())
 
 # Data wrangling and exploration
 # Assessing data
@@ -36,34 +42,31 @@ hour_duplicates = hour_df.duplicated().sum()
 # Exploratory Data Analysis (EDA)
 # Visualizations
 
-# Pertanyaan 1: Pengaruh suhu rata-rata terhadap jumlah penyewaan sepeda
-# Check the column name for temperature
-if 'temp' in bike_df.columns:
-    temperature_rentals = bike_df.groupby("temp")["cnt_hour"].mean().reset_index()
+# Pertanyaan 1: Bagaimana hari dalam seminggu memengaruhi jumlah penyewaan sepeda?
+# Group by weekday to analyze bike rental per weekday
+weekday_rentals = bike_df.groupby("weekday")["cnt_hour"].mean().reset_index()
 
-    plt.figure(figsize=(10, 6))
-    sns.lineplot(x="temp", y="cnt_hour", data=temperature_rentals)
-    plt.title("Pengaruh Suhu Rata-rata terhadap Jumlah Penyewaan Sepeda per Jam")
-    plt.xlabel("Suhu Rata-rata")
-    plt.ylabel("Rata-rata Jumlah Penyewaan Sepeda per Jam")
-    st.pyplot(plt)
-else:
-    st.write("The 'temp' column is not present in the data. Please check the correct column name for temperature.")
+plt.figure(figsize=(10, 6))
+sns.barplot(x="weekday", y="cnt_hour", data=weekday_rentals)
+plt.title("Pengaruh Hari dalam Seminggu terhadap Jumlah Penyewaan Sepeda per Jam")
+plt.xlabel("Hari dalam Seminggu")
+plt.ylabel("Rata-rata Jumlah Penyewaan Sepeda per Jam")
+plt.xticks(ticks=[0, 1, 2, 3, 4, 5, 6], labels=['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'])
+st.pyplot(plt)
 
-# Pertanyaan 2: Apakah musim tertentu lebih populer untuk penyewaan sepeda?
-# Assuming 'season' is present in the dataset (1 = spring, 2 = summer, 3 = fall, 4 = winter)
-if 'season' in bike_df.columns:
-    season_rentals = bike_df.groupby("season")["cnt_hour"].mean().reset_index()
+# Pertanyaan 2: Apakah ada perbedaan jumlah penyewaan sepeda antara jam sibuk dan non-sibuk?
+# Defining busy hours (7-9 AM and 4-6 PM)
+bike_df['busy_hour'] = bike_df['hr'].apply(lambda x: 'Sibuk' if (7 <= x <= 9) or (16 <= x <= 18) else 'Non-Sibuk')
 
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x="season", y="cnt_hour", data=season_rentals)
-    plt.title("Perbandingan Jumlah Penyewaan Sepeda pada Musim yang Berbeda")
-    plt.xlabel("Musim")
-    plt.ylabel("Rata-rata Jumlah Penyewaan Sepeda per Jam")
-    plt.xticks(ticks=[0, 1, 2, 3], labels=['Spring', 'Summer', 'Fall', 'Winter'])
-    st.pyplot(plt)
-else:
-    st.write("The 'season' column is not present in the data. Please check the correct column name for season.")
+# Group by busy_hour to analyze bike rental during busy vs non-busy hours
+busy_hour_rentals = bike_df.groupby("busy_hour")["cnt_hour"].mean().reset_index()
+
+plt.figure(figsize=(8, 5))
+sns.barplot(x="busy_hour", y="cnt_hour", data=busy_hour_rentals)
+plt.title("Perbandingan Jumlah Penyewaan Sepeda pada Jam Sibuk dan Non-Sibuk")
+plt.xlabel("Jam Sibuk / Non-Sibuk")
+plt.ylabel("Rata-rata Jumlah Penyewaan Sepeda per Jam")
+st.pyplot(plt)
 
 # Displaying Dataframe and other information if needed
 st.subheader("Data Info")
