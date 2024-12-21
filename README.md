@@ -27,4 +27,4 @@ This dashboard provides insights into bike rental data, answering specific quest
 Execute the following command in the activated conda environment to run the Streamlit app:
 
 ```bash
-streamlit run dashboard.py
+streamlit run main.py
