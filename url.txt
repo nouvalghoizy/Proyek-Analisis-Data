@@ -1,1 +1,1 @@
-http://192.168.2.64:8501
+https://mnouvalghoizy.streamlit.app/
