@@ -3,70 +3,59 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Adding a title
-st.title("Analisis Rental Sepeda, Menggunakan Dataset : Bike Sharing Dataset")
-st.write("Muhammad Nouval Ghoizy")
-st.write("Bangkit ID : m179b4ky2973 ")
-st.write("Bangkit Mail : m179b4ky2973@bangkit.academy ")
+# Judul aplikasi
+st.title("Analisis Rental Sepeda - Dataset Bike Sharing")
+st.write("Analisis oleh: Muhammad Nouval Ghoizy")
+st.write("Bangkit ID: m179b4ky2973 | Email: m179b4ky2973@bangkit.academy")
 
-# Load data
-day_df = pd.read_csv("day.csv")
-hour_df = pd.read_csv("hour.csv")
+# Membaca dataset
+harian_df = pd.read_csv("day.csv")
+jam_df = pd.read_csv("hour.csv")
 
-# Merge dataframes
-bike_df = hour_df.merge(day_df, on='dteday', how='inner', suffixes=('_hour', '_day'))
+# Menggabungkan dataset
+rental_data = jam_df.merge(harian_df, on='dteday', how='inner', suffixes=('_jam', '_harian'))
 
+# Eksplorasi Data Awal
+info_harian = harian_df.info()
+info_jam = jam_df.info()
 
-# Data wrangling and exploration
-# Assessing data
-day_info = day_df.info()
-hour_info = hour_df.info()
+missing_harian = harian_df.isnull().sum()
+missing_jam = jam_df.isnull().sum()
 
-day_missing_values = day_df.isna().sum()
-hour_missing_values = hour_df.isna().sum()
+duplicate_harian = harian_df.duplicated().sum()
+duplicate_jam = jam_df.duplicated().sum()
 
-day_duplicates = day_df.duplicated().sum()
-hour_duplicates = hour_df.duplicated().sum()
-
-# Cleaning data
-# Dataset tidak membutuhkan cleaning
-
-
-# EDA
-# Visualizations
-# Pertanyaan 1 : Bagaimana perbedaan jumlah penyewaan sepeda antara hari kerja dan hari libur?
-rentals_by_day_type = bike_df.groupby("workingday_day")["cnt_day"].mean().reset_index()
+# Visualisasi: Perbedaan Penyewaan antara Hari Kerja dan Hari Libur
+penyewaan_kerja_libur = rental_data.groupby("workingday_harian")["cnt_harian"].mean().reset_index()
 
 plt.figure(figsize=(8, 5))
-sns.barplot(x="workingday_day", y="cnt_day", data=rentals_by_day_type)
-plt.title("Perbedaan Jumlah Penyewaan Sepeda antara Hari Kerja dan Hari Libur")
-plt.xlabel("Hari Kerja(1) / Hari Libur(0)")
-plt.ylabel("Rata-rata Jumlah Penyewaan Sepeda")
-plt.xticks(ticks=[0,1], labels=["Hari Libur", "Hari Kerja"])
+sns.barplot(x="workingday_harian", y="cnt_harian", data=penyewaan_kerja_libur)
+plt.title("Penyewaan Sepeda: Hari Kerja vs Libur")
+plt.xlabel("Hari Kerja (1) / Libur (0)")
+plt.ylabel("Rata-rata Penyewaan Sepeda")
+plt.xticks(ticks=[0, 1], labels=["Libur", "Kerja"])
 st.pyplot(plt)
 
-# Pertanyaan 2 : Bagaimana pengaruh cuaca terhadap jumlah penyewaan sepeda per jam?
-weather_hourly = bike_df.groupby("weathersit_hour")["cnt_hour"].mean().reset_index()
+# Visualisasi: Pengaruh Cuaca terhadap Penyewaan Sepeda per Jam
+pengaruh_cuaca = rental_data.groupby("weathersit_jam")["cnt_jam"].mean().reset_index()
 
 plt.figure(figsize=(10, 6))
-sns.barplot(x="weathersit_hour", y="cnt_hour", data=weather_hourly)
-plt.title("Pengaruh Cuaca terhadap Jumlah Penyewaan sepeda per Jam")
-plt.xlabel("Keadaan Cuaca")
-plt.ylabel("Rata-rata Jumlah Penyewaan Sepeda per Jam")
-plt.xticks(ticks=[0, 1, 2, 3], labels=['Springer', 'Summer', 'Fall', 'Winter'])
+sns.barplot(x="weathersit_jam", y="cnt_jam", data=pengaruh_cuaca)
+plt.title("Pengaruh Cuaca terhadap Penyewaan per Jam")
+plt.xlabel("Kategori Cuaca")
+plt.ylabel("Rata-rata Penyewaan Sepeda per Jam")
+plt.xticks(ticks=[0, 1, 2, 3], labels=['Spring', 'Summer', 'Fall', 'Winter'])
 st.pyplot(plt)
 
+# Menampilkan Informasi Dataset
+st.subheader("Informasi Dataset")
+st.write("Info Harian:", info_harian)
+st.write("Info Jam:", info_jam)
 
+st.subheader("Nilai Kosong")
+st.write("Harian - Nilai Kosong:", missing_harian)
+st.write("Jam - Nilai Kosong:", missing_jam)
 
-# Displaying Dataframe and other information if needed
-st.subheader("Data Info")
-st.write("Day DataFrame Info:", day_info)
-st.write("Hour DataFrame Info:", hour_info)
-
-st.subheader("Missing Values")
-st.write("Day DataFrame Missing Values:", day_missing_values)
-st.write("Hour DataFrame Missing Values:", hour_missing_values)
-
-st.subheader("Duplicates")
-st.write("Day DataFrame Duplicates:", day_duplicates)
-st.write("Hour DataFrame Duplicates:", hour_duplicates)
+st.subheader("Data Duplikat")
+st.write("Harian - Duplikat:", duplicate_harian)
+st.write("Jam - Duplikat:", duplicate_jam)
