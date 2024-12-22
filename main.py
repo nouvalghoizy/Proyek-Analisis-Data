@@ -4,7 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Adding a title
-st.title("Bike Rental Analysis")
+st.title("Analisis Rental Sepeda, Menggunakan Dataset : Bike Sharing Dataset")
 st.write("Muhammad Nouval Ghoizy")
 st.write("Bangkit ID : m179b4ky2973 ")
 st.write("Bangkit Mail : m179b4ky2973@bangkit.academy ")
