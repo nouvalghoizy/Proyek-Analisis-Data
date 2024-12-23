@@ -8,14 +8,49 @@ st.title("Analisis Rental Sepeda - Dataset Bike Sharing")
 st.write("Analisis oleh: Muhammad Nouval Ghoizy")
 st.write("Bangkit ID: m179b4ky2973 | Email: m179b4ky2973@bangkit.academy")
 
+# Sidebar untuk filter interaktif
+st.sidebar.header("Filter Data")
+
 # Membaca dataset
-harian_df = pd.read_csv("day.csv")
-jam_df = pd.read_csv("hour.csv")
+@st.cache_data
+def load_data():
+    harian = pd.read_csv("day.csv")
+    jam = pd.read_csv("hour.csv")
+    
+    # Konversi 'dteday' ke datetime
+    harian['dteday'] = pd.to_datetime(harian['dteday'])
+    jam['dteday'] = pd.to_datetime(jam['dteday'])
+    
+    # Menggabungkan dataset
+    rental = jam.merge(harian, on='dteday', how='inner', suffixes=('_jam', '_harian'))
+    return harian, jam, rental
 
-# Menggabungkan dataset
-rental_data = jam_df.merge(harian_df, on='dteday', how='inner', suffixes=('_jam', '_harian'))
+harian_df, jam_df, rental_data = load_data()
 
-# Eksplorasi Data Awal
+# Menentukan rentang tanggal untuk filter
+min_date = rental_data['dteday'].min()
+max_date = rental_data['dteday'].max()
+
+start_date, end_date = st.sidebar.date_input(
+    "Pilih Rentang Tanggal",
+    [min_date, max_date],
+    min_value=min_date,
+    max_value=max_date
+)
+
+if isinstance(start_date, tuple) or isinstance(end_date, tuple):
+    start_date, end_date = start_date
+elif isinstance(start_date, pd.Timestamp):
+    start_date = start_date.to_pydatetime().date()
+    end_date = end_date.to_pydatetime().date()
+
+# Filter data berdasarkan rentang tanggal
+filtered_data = rental_data[
+    (rental_data['dteday'] >= pd.to_datetime(start_date)) &
+    (rental_data['dteday'] <= pd.to_datetime(end_date))
+]
+
+# Eksplorasi Data Awal (menggunakan data terfilter)
 info_harian = harian_df.info()
 info_jam = jam_df.info()
 
@@ -26,10 +61,10 @@ duplicate_harian = harian_df.duplicated().sum()
 duplicate_jam = jam_df.duplicated().sum()
 
 # Visualisasi: Perbedaan Penyewaan antara Hari Kerja dan Hari Libur
-penyewaan_kerja_libur = rental_data.groupby("workingday_harian")["cnt_harian"].mean().reset_index()
+penyewaan_kerja_libur = filtered_data.groupby("workingday_harian")["cnt_harian"].mean().reset_index()
 
 plt.figure(figsize=(8, 5))
-sns.barplot(x="workingday_harian", y="cnt_harian", data=penyewaan_kerja_libur)
+sns.barplot(x="workingday_harian", y="cnt_harian", data=penyewaan_kerja_libur, palette="viridis")
 plt.title("Penyewaan Sepeda: Hari Kerja vs Libur")
 plt.xlabel("Hari Kerja (1) / Libur (0)")
 plt.ylabel("Rata-rata Penyewaan Sepeda")
@@ -37,14 +72,14 @@ plt.xticks(ticks=[0, 1], labels=["Libur", "Kerja"])
 st.pyplot(plt)
 
 # Visualisasi: Pengaruh Cuaca terhadap Penyewaan Sepeda per Jam
-pengaruh_cuaca = rental_data.groupby("weathersit_jam")["cnt_jam"].mean().reset_index()
+pengaruh_cuaca = filtered_data.groupby("weathersit_jam")["cnt_jam"].mean().reset_index()
 
 plt.figure(figsize=(10, 6))
-sns.barplot(x="weathersit_jam", y="cnt_jam", data=pengaruh_cuaca)
+sns.barplot(x="weathersit_jam", y="cnt_jam", data=pengaruh_cuaca, palette="coolwarm")
 plt.title("Pengaruh Cuaca terhadap Penyewaan per Jam")
 plt.xlabel("Kategori Cuaca")
 plt.ylabel("Rata-rata Penyewaan Sepeda per Jam")
-plt.xticks(ticks=[0, 1, 2, 3], labels=['Spring', 'Summer', 'Fall', 'Winter'])
+plt.xticks(ticks=[0, 1, 2, 3], labels=['Clear', 'Mist', 'Light Snow/Rain', 'Heavy Rain'])
 st.pyplot(plt)
 
 # Menampilkan Informasi Dataset
