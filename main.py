@@ -76,10 +76,9 @@ pengaruh_cuaca = filtered_data.groupby("weathersit_jam")["cnt_jam"].mean().reset
 
 plt.figure(figsize=(10, 6))
 sns.barplot(x="weathersit_jam", y="cnt_jam", data=pengaruh_cuaca, palette="coolwarm")
-plt.title("Pengaruh Cuaca terhadap Penyewaan per Jam")
-plt.xlabel("Kategori Cuaca")
+plt.title("Statistik Penyewaan Sepeda Per Jam Berdasarkan Cuaca")
+plt.xlabel("Hour")
 plt.ylabel("Rata-rata Penyewaan Sepeda per Jam")
-plt.xticks(ticks=[0, 1, 2, 3], labels=['Clear', 'Mist', 'Light Snow/Rain', 'Heavy Rain'])
 st.pyplot(plt)
 
 # Menampilkan Informasi Dataset
