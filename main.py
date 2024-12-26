@@ -1,6 +1,8 @@
 import pandas as pd
-import seaborn as sns
+import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+import streamlit as st
 
 # Membaca dataset
 def load_data():
